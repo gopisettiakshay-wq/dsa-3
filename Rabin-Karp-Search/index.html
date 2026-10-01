@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rabin–Karp Search Engine</title>
+  <style>
+    :root{--ink:#182238;--muted:#697386;--line:#dce2ea;--blue:#2563eb;--bg:#f4f7fb;--card:#fff;--yellow:#ffe39a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px Inter,Segoe UI,Arial,sans-serif}.top{background:#101828;color:#fff;padding:17px max(22px,calc((100vw - 1240px)/2));display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;font-size:17px}.brand small{color:#aab5c8;font-weight:400;margin-left:10px}.shell{max-width:1240px;margin:24px auto;padding:0 20px;display:grid;grid-template-columns:340px 1fr;gap:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 5px 18px #22304b0a}.sidebar{padding:20px;height:max-content;position:sticky;top:16px}.eyebrow{color:var(--blue);text-transform:uppercase;font-size:11px;letter-spacing:.11em;font-weight:800}h1{font-size:23px;line-height:1.15;margin:8px 0}h2{font-size:20px;margin:0}h3{font-size:14px;margin:0}.muted{color:var(--muted);font-size:13px;line-height:1.45}.label{display:flex;justify-content:space-between;margin:16px 0 6px;font-size:12px;font-weight:700}.label span{color:var(--muted);font-weight:400}input[type=text],textarea{width:100%;padding:11px;border:1px solid #c9d2df;border-radius:8px;font:inherit}textarea{height:148px;resize:vertical}.drop{display:block;border:1px dashed #9ba8bb;border-radius:8px;padding:13px;text-align:center;font-size:12px;background:#fbfcfe}.drop input{display:none}.file-list{display:grid;gap:6px;margin-top:8px}.file{background:#f2f5fa;padding:7px 9px;border-radius:6px;font-size:11px;display:flex;justify-content:space-between}.file button{color:#be2733;border:0;background:none;cursor:pointer}.checks{margin-top:14px;display:grid;gap:10px;font-size:12px}.checks label{display:flex;justify-content:space-between}.primary,.secondary{border:0;border-radius:8px;padding:11px 14px;cursor:pointer;font-weight:700}.primary{background:var(--blue);color:#fff;width:100%;margin-top:16px}.secondary{border:1px solid #c9d2df;background:#fff;font-size:12px;padding:7px 10px}.main{display:grid;gap:16px}.hero{padding:22px;display:flex;justify-content:space-between;gap:16px;align-items:center}.badges{display:flex;gap:8px}.badge{background:#e9f7ef;color:#157347;border:1px solid #cbeed9;border-radius:7px;padding:7px 9px;font-size:12px;font-weight:700}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}.metric{padding:15px}.metric small{color:var(--muted)}.metric b{font-size:25px;display:block;margin-top:4px}.grid{display:grid;grid-template-columns:1.5fr .9fr;gap:16px}.head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.doc{white-space:pre-wrap;word-break:break-word;min-height:350px;max-height:530px;overflow:auto;padding:17px;font:13px/1.75 Consolas,monospace}.empty{display:grid;place-items:center;text-align:center;color:var(--muted);font:13px Inter,Arial}.mark{background:var(--yellow);border-radius:2px}.right{display:grid;align-content:start;gap:16px}.lps{padding:16px;display:flex;gap:5px;overflow:auto;min-height:100px}.cell{text-align:center}.char,.num{width:32px;height:30px;display:grid;place-items:center}.char{background:#eaf1ff;border:1px solid #cadbff;border-radius:5px 5px 0 0;font-weight:700}.num{border:1px solid var(--line);border-top:0;border-radius:0 0 5px 5px;color:var(--muted);font-size:12px}.matches{max-height:300px;overflow:auto}.match-row{padding:11px 14px;border-bottom:1px solid #edf0f4;display:grid;grid-template-columns:28px 1fr auto;gap:9px;align-items:center;cursor:pointer;font-size:12px}.match-row:hover{background:#f7f9fc}.n{background:#eaf1ff;color:var(--blue);width:25px;height:25px;border-radius:6px;display:grid;place-items:center;font-weight:700}.match-row small{color:var(--muted)}.toast{position:fixed;right:22px;bottom:22px;background:#101828;color:#fff;border-radius:7px;padding:10px 13px;font-size:12px;opacity:0;transition:.2s}.toast.show{opacity:1}@media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{position:static}.grid{grid-template-columns:1fr}}@media(max-width:600px){.metrics{grid-template-columns:1fr 1fr}.badges{display:none}.brand small{display:none}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="brand">Rabin–Karp Search Engine <small>High-performance pattern intelligence</small></div><span>● Engine ready</span></header>
+  <div class="shell">
+    <aside class="card sidebar">
+      <div class="eyebrow">Search configuration</div><h1>Find exact patterns with rolling hashes.</h1><p class="muted">Use the Java implementation of the Rabin–Karp algorithm on typed text or uploaded files.</p>
+      <label class="label">Search pattern <span id="patternLength">0 characters</span></label><input id="pattern" type="text" placeholder="Enter an exact pattern" autocomplete="off">
+      <label class="label">Text source <span>Manual input</span></label><textarea id="sourceText" placeholder="Paste or type text to analyze"></textarea>
+      <div class="label">Or upload text files <span>.txt, .md, .csv, .log</span></div><label class="drop">Choose one or more text files<input id="files" type="file" multiple accept=".txt,.md,.csv,.log,text/plain"></label><div id="fileList" class="file-list"></div>
+      <div class="checks"><label>Case-sensitive search <input id="caseSensitive" type="checkbox" checked></label><label>Include overlapping matches <input id="overlap" type="checkbox" checked></label></div><button id="run" class="primary">Run Rabin–Karp analysis →</button>
+    </aside>
+    <main class="main">
+      <section class="card hero"><div><div class="eyebrow">Analysis dashboard</div><h2>Pattern search overview</h2><p id="summary" class="muted">Configure a pattern and text source to begin.</p></div><div class="badges"><span class="badge">Expected O(N + M)</span><span class="badge">Worst O(N × M)</span></div></section>
+      <section class="metrics"><div class="card metric"><small>Total matches</small><b id="matchCount">0</b></div><div class="card metric"><small>Comparisons</small><b id="comparisons">0</b></div><div class="card metric"><small>Characters</small><b id="characters">0</b></div><div class="card metric"><small>Execution</small><b id="runtime">0.00 ms</b></div></section>
+      <section class="grid"><section class="card"><div class="head"><div><h3>Highlighted result</h3><small id="sourceName" class="muted">No source selected</small></div><button id="copy" class="secondary">Copy text</button></div><div id="document" class="doc empty">Your analyzed text will appear here.</div></section><div class="right"><section class="card"><div class="head"><h3>Rolling hash details</h3></div><div id="hashInfo" class="lps empty">Run a search to inspect hash statistics.</div></section><section class="card"><div class="head"><h3>Match locations</h3><small id="locationCount" class="muted">0 results</small></div><div id="matchList" class="matches empty" style="min-height:160px">No match locations yet.</div></section></div></section>
+      <section id="editPanel" class="card" hidden style="padding:20px">
+        <h3>Pattern not found? Edit and download</h3>
+        <p class="muted">Choose a source with no matches, edit its text, and download a UTF-8 copy. Your original file stays unchanged. Apply your edits to search the updated text again.</p>
+        <label class="label" for="editSource">Source with no matches</label>
+        <select id="editSource" style="width:100%;padding:10px;border:1px solid #c9d2df;border-radius:8px"></select>
+        <label class="label" for="editText">File contents <span>Drafts are kept when switching sources</span></label>
+        <textarea id="editText" style="min-height:230px;font-family:Consolas,monospace" spellcheck="false"></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <button id="downloadEdited" class="secondary">Download edited copy</button>
+          <button id="applyEdited" class="secondary">Apply edits and search again</button>
+        </div>
+        <p id="editStatus" class="muted" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+  </div><div id="toast" class="toast"></div>
+  <script>
+    const $=id=>document.getElementById(id); let uploads=[], results=[], all=[], active=0, resultPattern='';
+    const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const say=s=>{$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1800)};
+    function files(){ $('fileList').innerHTML=uploads.map((f,i)=>`<div class="file"><span>${escape(f.name)} · ${f.text.length.toLocaleString()} chars</span><button data-remove="${i}">Remove</button></div>`).join(''); document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{uploads.splice(+b.dataset.remove,1);files()}) }
+    $('files').onchange=async e=>{for(const f of e.target.files)uploads.push({name:f.name,text:await f.text()});files()};
+    $('pattern').oninput=e=>$('patternLength').textContent=`${[...e.target.value].length} characters`;
+    function drawHash(data){
+      $('hashInfo').classList.remove('empty');
+      $('hashInfo').style.display='block';
+      $('hashInfo').innerHTML=[
+        ['Pattern hash',data.patternHash],['Base',data.base],['Modulus',data.modulus],
+        ['Windows checked',data.windows],['Equal-hash candidates',data.hashHits],
+        ['Rejected collisions',data.collisions]
+      ].map(([label,value])=>'<div style="margin-bottom:7px">'+label+': <b>'+Number(value).toLocaleString()+'</b></div>').join('')
+        +'<p class="muted">Every equal-hash candidate is verified character by character. Comparisons count verification only.</p>';
+    }
+    function showSource(i){
+      active=i;const src=results[i];if(!src)return;
+      // Merge overlapping intervals so highlighted output never duplicates source characters.
+      const ranges=[];
+      src.matches.forEach(m=>{
+        const end=m.index+resultPattern.length, last=ranges[ranges.length-1];
+        if(last && m.index<=last.end)last.end=Math.max(last.end,end);
+        else ranges.push({start:m.index,end});
+      });
+      let output='',cursor=0;
+      ranges.forEach(r=>{output+=escape(src.text.slice(cursor,r.start))+'<mark class="mark">'+escape(src.text.slice(r.start,r.end))+'</mark>';cursor=r.end;});
+      output+=escape(src.text.slice(cursor));
+      $('document').classList.remove('empty');$('document').innerHTML=output||'The selected source is empty.';
+      $('sourceName').textContent=src.name;
+    }
+    function drawMatches(){let box=$('matchList');if(!all.length){box.classList.add('empty');box.style.minHeight='160px';box.textContent='No matches found.';return}box.classList.remove('empty');box.style.minHeight='';box.innerHTML=all.map((x,i)=>`<div class="match-row" data-i="${i}"><span class="n">${i+1}</span><div><b>${escape(results[x.source].name)}</b><br><small>Line ${x.line}, column ${x.column}</small></div><small>index ${x.index}</small></div>`).join('');box.querySelectorAll('.match-row').forEach(row=>row.onclick=()=>showSource(all[+row.dataset.i].source))}
+    async function run(){const pattern=$('pattern').value;const sources=[];if($('sourceText').value)sources.push({name:'Manual input',text:$('sourceText').value});sources.push(...uploads);const sourceTargets=sources.map(s=>uploads.includes(s) ? s : null);if(!pattern)return say('Enter a search pattern first');if(!sources.length)return say('Add text or upload a file');$('run').disabled=true;$('run').textContent='Analyzing…';try{const response=await fetch('/api/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pattern,caseSensitive:$('caseSensitive').checked,overlap:$('overlap').checked,sources})});const data=await response.json();if(!response.ok)throw Error(data.error);results=data.results;resultPattern=pattern;setupEditor(sourceTargets);all=[];results.forEach((r,source)=>r.matches.forEach(m=>all.push({...m,source})));$('matchCount').textContent=data.matches.toLocaleString();$('comparisons').textContent=data.comparisons.toLocaleString();$('characters').textContent=data.characters.toLocaleString();$('runtime').textContent=data.elapsedMs.toFixed(2)+' ms';$('locationCount').textContent=`${all.length} result${all.length===1?'':'s'}`;$('summary').textContent=`Analyzed ${results.length} source${results.length===1?'':'s'} for “${pattern}” using Java Rabin–Karp matching.`;drawHash(data);drawMatches();showSource(0);say(`Analysis complete · ${all.length} matches`)}catch(error){say(error.message||'Could not contact the Java server.')}finally{$('run').disabled=false;$('run').textContent='Run Rabin–Karp analysis →'}}
+    let editEntries=[];
+    function setupEditor(targets){
+      editEntries=results.map((result,index)=>({result,target:targets[index],draft:result.text}))
+        .filter(entry=>entry.result.matches.length===0);
+      $('editPanel').hidden=editEntries.length===0;
+      $('editSource').replaceChildren();
+      editEntries.forEach((entry,index)=>{
+        const option=document.createElement('option');
+        option.value=String(index);option.textContent=entry.result.name;
+        $('editSource').append(option);
+      });
+      $('editStatus').textContent='';
+      if(editEntries.length){$('editSource').value='0';$('editText').value=editEntries[0].draft;}
+    }
+    $('editText').oninput=()=>{
+      const entry=editEntries[Number($('editSource').value)];
+      if(entry)entry.draft=$('editText').value;
+      $('editStatus').textContent='Draft updated. Download or apply your changes.';
+    };
+    $('editSource').onchange=()=>{
+      $('editText').value=editEntries[Number($('editSource').value)].draft;
+      $('editStatus').textContent='';
+    };
+    $('downloadEdited').onclick=()=>{
+      const entry=editEntries[Number($('editSource').value)];if(!entry)return;
+      entry.draft=$('editText').value;
+      const original=entry.target ? entry.result.name : 'manual-input.txt';
+      const dot=original.lastIndexOf('.');
+      const name=dot>0 ? original.slice(0,dot)+'-edited'+original.slice(dot) : original+'-edited.txt';
+      const url=URL.createObjectURL(new Blob([entry.draft],{type:'text/plain;charset=utf-8'}));
+      const link=document.createElement('a');link.href=url;link.download=name;
+      document.body.append(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      $('editStatus').textContent='Download requested: '+name;
+    };
+    $('applyEdited').onclick=()=>{
+      // Apply every draft so switching files never loses an edit during a new search.
+      if(editEntries.some(entry=>entry.target && !uploads.includes(entry.target))){
+        $('editStatus').textContent='A source was removed. Download any drafts you need, then run a new search.';
+        return;
+      }
+      editEntries.forEach(entry=>{
+        if(entry.target)entry.target.text=entry.draft;
+        else $('sourceText').value=entry.draft;
+      });
+      files();run();
+    };
+    $('run').onclick=run;$('pattern').onkeydown=e=>{if(e.key==='Enter')run()};$('copy').onclick=async()=>{if(results[active]){await navigator.clipboard.writeText(results[active].text);say('Source text copied')}};
+  </script>
+</body>
+</html>
